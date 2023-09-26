@@ -60,12 +60,29 @@ export default function Dump({ jwt }: { jwt: string }) {
           },
         }
       );
+      if (result.status === 403) {
+        throw new Error(
+          "Unauthorized, did you sign in with your friend.tech wallet?",
+          {
+            cause: "UNAUTHORIZED",
+          }
+        );
+      }
       checkFetchResponse(result, "Failed to get holdings from FriendTech");
       return result.json();
     },
     {
       refetchOnWindowFocus: false,
       enabled: address !== undefined,
+      retry: (failureCount, error: Error) => {
+        if (failureCount === 3) {
+          return false;
+        }
+        if (error.cause === "UNAUTHORIZED") {
+          return false;
+        }
+        return true;
+      },
     }
   );
   const showError = isError || transactionError !== undefined;
