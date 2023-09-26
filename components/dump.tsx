@@ -65,6 +65,7 @@ export default function Dump({ jwt }: { jwt: string }) {
     },
     {
       refetchOnWindowFocus: false,
+      enabled: address !== undefined,
     }
   );
   const showError = isError || transactionError !== undefined;
@@ -87,7 +88,7 @@ export default function Dump({ jwt }: { jwt: string }) {
       setTransactionError(error as BaseError);
     }
   }, [data?.holdings, refetch]);
-
+  if (address === undefined) return null;
   return (
     <>
       {showError ? (
